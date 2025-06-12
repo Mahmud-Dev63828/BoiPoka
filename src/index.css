@@ -1,1 +1,20 @@
 @import "tailwindcss";
+:root {
+  --whitee: #ffffff;
+  --grayy: #595c5d;
+  --textPrimary: #181a1c;
+  --redd: #f3666d;
+
+  --inter: "Inter", sans-serif;
+  --poppins: "Poppins", sans-serif;
+}
+
+@theme {
+  --color-whitee: var(--whitee);
+  --color-grayy: var(--grayy);
+  --color-textPrimary: var(--textPrimary);
+  --color-redd: var(--redd);
+
+  --font-inter: var(--inter);
+  --font-poppins: var(--poppins);
+}
