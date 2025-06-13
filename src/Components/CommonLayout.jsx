@@ -6,7 +6,7 @@ const CommonLayout = () => {
   return (
     <div className="flex h-screen w-full commonlayout overflow-hidden">
       <Sidebar />
-      <div className="flex flex-col w-4/5 p-5 bg-[rgba(255,255,255,0.77)] pt-10">
+      <div className="flex flex-col w-full p-5 bg-[rgba(255,255,255,0.77)] pt-10">
         <Outlet />
       </div>
     </div>

@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import BannerImg from "../../assets/Home/bannerImg1.png";
 import { GiBookAura } from "react-icons/gi";
 import gsap from "gsap";
+import { RiAddCircleFill } from "react-icons/ri";
+import { IoAdd } from "react-icons/io5";
 
 const Banner = ({ totalPages = 100 }) => {
   const [timeLeft, setTimeLeft] = useState(3600); // 1 hour countdown
@@ -46,11 +48,12 @@ const Banner = ({ totalPages = 100 }) => {
   };
 
   return (
-    <div className="w-full h-[50vh] relative overflow-hidden bg-white flex flex-col md:flex-row items-center justify-between px-6 md:px-10 py-6">
+    <div className="w-full h-[49vh] relative overflow-hidden bg-white flex flex-col md:flex-row items-center justify-between px-6 md:px-10 py-1">
       {/* Red background shape on right side */}
 
       {/* Left text content */}
       <div className="z-10 max-w-xl text-center md:text-left">
+        <div className="w-6 h-2.5 bg-red-400 rounded-full mb-1" />
         <h1 className="text-4xl font-semibold text-gray-800">
           Happy reading, <br />
           Mahmud
@@ -63,6 +66,7 @@ const Banner = ({ totalPages = 100 }) => {
           <button className="bg-gray-900 text-white px-5 py-2 rounded-full hover:bg-gray-800 transition">
             Start reading ↗
           </button>
+
           <span className="font-mono text-xl text-gray-700">
             ⏳ {formatTime(timeLeft)}
           </span>
@@ -70,18 +74,23 @@ const Banner = ({ totalPages = 100 }) => {
       </div>
 
       {/* Right book image */}
-      <div className="relative z-10 w-full md:w-[600px] flex justify-center items-center">
+      <div className="relative z-10 w-full md:w-[600px] mb-10 flex justify-center items-center">
         <img
           src={BannerImg}
           alt="Book"
-          className="w-full max-w-md object-contain"
+          className="w-full max-w-md object-contain "
         />
         <div className="absolute flex flex-col items-center top-1/2  transform -translate-y-1/2 text-center">
-          <span className="text-gray-900 text-5xl">
+          <span className="text-gray-900 text-6xl">
             <GiBookAura />
           </span>
-          <h3 className="text-lg font-bold text-gray-800">The Timekeeper</h3>
+          <h3 className="text-lg mt-3 font-bold text-gray-800">
+            The Timekeeper
+          </h3>
           <p className="text-sm text-gray-600">by Mitch Albom</p>
+          <button className="mt-8 cursor-pointer bg-gray-400 text-whitee px-5 py-1.5 rounded-3xl">
+            Update
+          </button>
         </div>
       </div>
       {/* progress bar */}
@@ -119,12 +128,18 @@ const Banner = ({ totalPages = 100 }) => {
           </div>
         </div>
 
-        <button
+        {/* <button
           onClick={handleNextPage}
           className="mt-6 px-6 py-2 bg-red-400 text-white rounded-xl hover:bg-red-500 shadow-lg"
         >
           পড়া চালিয়ে যান (Next Page)
-        </button>
+        </button> */}
+        <div className="flex items-center bg-red-400 rounded-xl px-8  py-2">
+          <p className="text-xl text-whitee">Add Book</p>
+          <span className="  text-whitee  text-3xl">
+            <IoAdd />
+          </span>
+        </div>
       </div>
     </div>
   );
