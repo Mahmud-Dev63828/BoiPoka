@@ -18,3 +18,10 @@
   --font-inter: var(--inter);
   --font-poppins: var(--poppins);
 }
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE এবং Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
