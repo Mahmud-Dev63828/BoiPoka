@@ -8,7 +8,6 @@ const navList = [
   { id: 1, icon: <GoHome />, path: "/" },
   { id: 2, icon: <GiBlackBook />, path: "/books" },
   { id: 3, icon: <MdOutlineBookmarkAdd />, path: "/bookmarks" },
-  { id: 4, icon: <MdOutlineGraphicEq />, path: "/stats" },
 ];
 
 const Sidebar = () => {

@@ -16,7 +16,6 @@ const App = () => {
         <Route path="/" element={<CommonLayout />}>
           <Route index element={<Home />} />
           <Route path="/books" element={<BookStore />} />
-          <Route path="/stats" element={<Insights />} />
           <Route path="/bookmarks" element={<AddBook />} />
           <Route path="/calender" element={<CalendarPopup />} />
           <Route path="/bookdetails" element={<BookDetails />} />

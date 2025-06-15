@@ -5,10 +5,13 @@ import gsap from "gsap";
 import { RiAddCircleFill } from "react-icons/ri";
 import { IoAdd } from "react-icons/io5";
 import BookProgressBar from "../CommonComponent/BookProgressBar";
+import CircleProgressBar from "../CommonComponent/CircleProgressBar";
+import AddBookModal from "../AddBook/AddBookModal";
 
 const Banner = ({ totalPages = 100 }) => {
-  const [timeLeft, setTimeLeft] = useState(3600); // 1 hour countdown
+  const [timeLeft, setTimeLeft] = useState(3600);
   const [currentPage, setCurrentPage] = useState(0);
+  const [showAddBook, setShowAddBook] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -47,6 +50,7 @@ const Banner = ({ totalPages = 100 }) => {
       .toString()
       .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
+  console.log(showAddBook);
 
   return (
     <div className="w-full h-[49vh] relative overflow-hidden bg-white flex flex-col md:flex-row items-center justify-between px-6 md:px-10 py-1">
@@ -71,7 +75,10 @@ const Banner = ({ totalPages = 100 }) => {
           <span className="font-mono text-xl text-gray-700">
             ⏳ {formatTime(timeLeft)}
           </span>
-          <div className="flex items-center bg-red-400 rounded-xl px-3  py-1">
+          <div
+            onClick={() => setShowAddBook(!showAddBook)}
+            className="flex items-center bg-red-400 rounded-xl px-3  py-1"
+          >
             <p className="text-sm text-whitee">Add Book</p>
             <span className="  text-whitee  text-xl">
               <IoAdd />
@@ -102,38 +109,12 @@ const Banner = ({ totalPages = 100 }) => {
       </div>
       {/* progress bar */}
       <div className="flex flex-col items-center justify-center h-screen bg-white">
-        <div className="relative w-60 h-60">
-          <svg className="absolute w-full h-full" viewBox="0 0 256 256">
-            {/* Background Circle */}
-            <circle
-              cx="128"
-              cy="128"
-              r="90"
-              stroke="#f5f5f5"
-              strokeWidth="15"
-              fill="none"
-            />
-            {/* Animated Progress Circle */}
-            <circle
-              ref={circleRef}
-              cx="128"
-              cy="128"
-              r="90"
-              stroke="#f87171"
-              strokeWidth="15"
-              fill="none"
-              strokeDasharray={2 * Math.PI * 90}
-              strokeDashoffset={2 * Math.PI * 90}
-              strokeLinecap="round"
-              transform="rotate(-90 128 128)"
-            />
-          </svg>
-          {/* Center Text */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <h1 className="text-4xl font-bold text-gray-800">{percentage}%</h1>
-            <p className="text-sm text-gray-500">Employee Satisfactory</p>
-          </div>
-        </div>
+        <CircleProgressBar
+          percentage={75}
+          label="Reading Progress"
+          width="33dvw"
+          height="33dvh"
+        />
 
         {/* <button
           onClick={handleNextPage}
@@ -146,6 +127,16 @@ const Banner = ({ totalPages = 100 }) => {
           <BookProgressBar currentPage={220} totalPages={300} />
         </span>
       </div>
+      {showAddBook && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm"
+          onClick={() => setShowAddBook(false)} // 👈 close on background click
+        >
+          <div onClick={(e) => e.stopPropagation()}>
+            <AddBookModal />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

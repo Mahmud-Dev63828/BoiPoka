@@ -1,16 +1,4 @@
-const InsightCard = ({ title, pages, books }) => {
-  return (
-    <div className="flex flex-col bg-red-50 border border-red-100 rounded-xl shadow p-3 w-[48%] h-fit">
-      <div className="w-2.5 h-2.5 bg-red-400 rounded-full mb-1" />
-      <h2 className="text-sm text-gray-700 font-medium">{title}</h2>
-      <p className="text-lg font-bold text-gray-900 leading-5">{pages} Pages</p>
-      <p className="text-xs text-gray-600 leading-4">{books} Books</p>
-      <div className="mt-2 text-xs text-red-500 hover:underline cursor-pointer">
-        View Insights
-      </div>
-    </div>
-  );
-};
+import InsightCard from "../CommonComponent/InsightCard";
 
 const Insights = () => {
   const insights = [
@@ -21,7 +9,7 @@ const Insights = () => {
   ];
 
   return (
-    <div className="w-full md:w-1/2 px-4 py-2 flex flex-wrap gap-4 justify-between">
+    <div className=" w-1/2 px-4 py-2 flex flex-wrap gap-4 justify-between">
       {insights.map((insight, idx) => (
         <InsightCard
           key={idx}
