@@ -4,6 +4,7 @@ import { GiBookAura } from "react-icons/gi";
 import gsap from "gsap";
 import { RiAddCircleFill } from "react-icons/ri";
 import { IoAdd } from "react-icons/io5";
+import BookProgressBar from "../CommonComponent/BookProgressBar";
 
 const Banner = ({ totalPages = 100 }) => {
   const [timeLeft, setTimeLeft] = useState(3600); // 1 hour countdown
@@ -70,6 +71,12 @@ const Banner = ({ totalPages = 100 }) => {
           <span className="font-mono text-xl text-gray-700">
             ⏳ {formatTime(timeLeft)}
           </span>
+          <div className="flex items-center bg-red-400 rounded-xl px-3  py-1">
+            <p className="text-sm text-whitee">Add Book</p>
+            <span className="  text-whitee  text-xl">
+              <IoAdd />
+            </span>
+          </div>
         </div>
       </div>
 
@@ -95,7 +102,7 @@ const Banner = ({ totalPages = 100 }) => {
       </div>
       {/* progress bar */}
       <div className="flex flex-col items-center justify-center h-screen bg-white">
-        <div className="relative w-64 h-64">
+        <div className="relative w-60 h-60">
           <svg className="absolute w-full h-full" viewBox="0 0 256 256">
             {/* Background Circle */}
             <circle
@@ -112,7 +119,7 @@ const Banner = ({ totalPages = 100 }) => {
               cx="128"
               cy="128"
               r="90"
-              stroke="#f87171" // Tailwind red-400 hex
+              stroke="#f87171"
               strokeWidth="15"
               fill="none"
               strokeDasharray={2 * Math.PI * 90}
@@ -134,12 +141,10 @@ const Banner = ({ totalPages = 100 }) => {
         >
           পড়া চালিয়ে যান (Next Page)
         </button> */}
-        <div className="flex items-center bg-red-400 rounded-xl px-8  py-2">
-          <p className="text-xl text-whitee">Add Book</p>
-          <span className="  text-whitee  text-3xl">
-            <IoAdd />
-          </span>
-        </div>
+
+        <span className="mb-8">
+          <BookProgressBar currentPage={220} totalPages={300} />
+        </span>
       </div>
     </div>
   );
