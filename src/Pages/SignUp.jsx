@@ -15,6 +15,7 @@ import { getDatabase, push, ref, set } from "firebase/database";
 
 import { auth } from "../../Database/firebase.config";
 import { db } from "../../Database/firebase.config";
+import { FcGoogle } from "react-icons/fc";
 const SignUp = () => {
   // const auth = getAuth();
   const data = libery.signupData();
@@ -272,7 +273,10 @@ const SignUp = () => {
                 onClick={handleGoogle}
                 className="border cursor-pointer border-gray-300 p-2 rounded-md"
               >
-                <FaGoogle className="text-xl" />
+                <span className="text-xl">
+                  {" "}
+                  <FcGoogle />{" "}
+                </span>
               </button>
             </div>
           </form>

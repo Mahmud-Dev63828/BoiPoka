@@ -11,6 +11,7 @@ import {
 } from "firebase/auth";
 import { getDatabase, ref, set } from "firebase/database";
 import { auth } from "../../Database/firebase.config";
+import { FcGoogle } from "react-icons/fc";
 
 const SignIn = () => {
   const { InfoToast, SuccesToast, ErrorToast } = libery;
@@ -200,7 +201,10 @@ const SignIn = () => {
                 onClick={handleGoogleSignIn}
                 className="border border-gray-300 p-2 rounded-md"
               >
-                <FaGoogle className="text-xl" />
+                <span className="text-xl">
+                  {" "}
+                  <FcGoogle />{" "}
+                </span>
               </button>
             </div>
           </form>
