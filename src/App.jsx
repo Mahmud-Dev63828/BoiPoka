@@ -8,6 +8,7 @@ import Insights from "./Components/HomeComponents/Insights";
 import CalendarPopup from "./Components/CommonComponent/CalendarPopup";
 import AddBook from "./Pages/AddBook";
 import BookDetails from "./Components/CommonComponent/BookDetails";
+import SignUp from "./Pages/SignUp";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
           <Route path="/calender" element={<CalendarPopup />} />
           <Route path="/bookdetails" element={<BookDetails />} />
         </Route>
+        <Route path="/signup" element={<SignUp />} />
       </Routes>
     </BrowserRouter>
   );
