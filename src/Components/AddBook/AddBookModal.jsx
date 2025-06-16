@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { FaBook } from "react-icons/fa";
-import { FaRegCalendarAlt } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { FaBook, FaRegCalendarAlt, FaUpload } from "react-icons/fa";
 import CalendarPopup from "../CommonComponent/CalendarPopup";
 import SelectDropdown from "../CommonComponent/SelectDropdown ";
+import { update } from "firebase/database";
 
 const AddBookModal = () => {
   const [book, setBook] = useState({
@@ -11,6 +11,7 @@ const AddBookModal = () => {
     category: "Fiction",
     startDate: new Date(),
     endDate: "",
+    coverUrl: "",
   });
 
   const [showCalendar, setShowCalendar] = useState(false);
@@ -36,15 +37,61 @@ const AddBookModal = () => {
     }
   };
 
-  const handleAdd = () => {
-    console.log("Book Added:", book);
-  };
-  console.log(book);
-
   const handleDateSelect = (date) => {
     setBook((prev) => ({ ...prev, endDate: date }));
     setShowCalendar(false);
   };
+
+  // upload wizard
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://upload-widget.cloudinary.com/latest/global/all.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
+  const handleCoverUpload = () => {
+    if (window.cloudinary) {
+      cloudinary.openUploadWidget(
+        {
+          cloudName: "dazbaelpk",
+          uploadPreset: "BoiPoka",
+          googleApiKey: "AIzaSyBj7HACYr7i1dWgC81FalKEwMuPXarS3rk",
+          searchBySites: ["all", "cloudinary.com"],
+          searchByRights: true,
+          sources: [
+            "local",
+            "url",
+            "camera",
+            "image_search",
+            "dropbox",
+            "image_search",
+            "shutterstock",
+            "unsplash",
+          ],
+        },
+        (error, result) => {
+          if (error) {
+            throw new Error("cloudinary profile picture upload error");
+          }
+          if (result.info.secure_url) {
+            // for update profile picture on state
+            setBook((prev) => ({
+              ...prev,
+              coverUrl: result.info.secure_url,
+            }));
+          }
+        }
+      );
+    } else {
+      throw new Error("upload failed");
+    }
+  };
+
+  const handleAdd = () => {
+    console.log("Book Added:", book);
+  };
+  console.log(book);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6 relative">
@@ -75,7 +122,6 @@ const AddBookModal = () => {
 
           <SelectDropdown value={book.category} onChange={handleChange} />
 
-          {/* Start Date: editable with default current datetime */}
           <div>
             <label className="block text-sm text-gray-600 mb-1">
               Start Date
@@ -89,7 +135,6 @@ const AddBookModal = () => {
             />
           </div>
 
-          {/* End Date: with calendar popup above input */}
           <div className="relative">
             <label className="block text-sm text-gray-600 mb-1">End Date</label>
             <div className="flex items-center relative">
@@ -115,6 +160,27 @@ const AddBookModal = () => {
                   onSelect={handleDateSelect}
                 />
               </div>
+            )}
+          </div>
+
+          {/* Cloudinary Upload Button */}
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">
+              Book Cover
+            </label>
+            <button
+              onClick={handleCoverUpload}
+              className="flex items-center gap-2 bg-red-100 text-red-600 hover:bg-red-200 font-medium px-4 py-2 rounded-lg"
+            >
+              <FaUpload />
+              Upload Cover
+            </button>
+            {book.coverUrl && (
+              <img
+                src={book.coverUrl}
+                alt="Cover Preview"
+                className="mt-3 w-32 h-40 object-cover rounded-lg shadow-md"
+              />
             )}
           </div>
 

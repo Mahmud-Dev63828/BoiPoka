@@ -1,8 +1,31 @@
-import React from "react";
-import { Outlet, useLocation } from "react-router-dom";
-import Sidebar from "./CommonComponent/Sidebar";
+import React, { useEffect, useState } from "react";
+import { Outlet } from "react-router-dom";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
+import Sidebar from "./CommonComponent/Sidebar";
+import UserNotVerified from "../Pages/Error/UserNotVerified";
+import { auth } from "../../Database/firebase.config";
 const CommonLayout = () => {
+  const [userVerified, setUserVerified] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user && user.emailVerified) {
+        setUserVerified(true);
+      } else {
+        setUserVerified(false);
+      }
+    });
+
+    // Cleanup the listener on unmount
+    return () => unsubscribe();
+  }, []);
+
+  // Conditional rendering
+  if (!userVerified) {
+    return <UserNotVerified />;
+  }
+
   return (
     <div className="flex h-screen w-full commonlayout overflow-hidden">
       <Sidebar />
