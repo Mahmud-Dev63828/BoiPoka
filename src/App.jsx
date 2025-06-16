@@ -9,6 +9,7 @@ import CalendarPopup from "./Components/CommonComponent/CalendarPopup";
 import AddBook from "./Pages/AddBook";
 import BookDetails from "./Components/CommonComponent/BookDetails";
 import SignUp from "./Pages/SignUp";
+import SignIn from "./Pages/SignIn";
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
           <Route path="/bookdetails" element={<BookDetails />} />
         </Route>
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/signin" element={<SignIn />} />
       </Routes>
     </BrowserRouter>
   );

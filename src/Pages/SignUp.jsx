@@ -9,9 +9,12 @@ import {
   sendEmailVerification,
   GoogleAuthProvider,
   signInWithPopup,
+  updateProfile,
 } from "firebase/auth";
+import { getDatabase, push, ref, set } from "firebase/database";
 
 import { auth } from "../../Database/firebase.config";
+import { db } from "../../Database/firebase.config";
 const SignUp = () => {
   // const auth = getAuth();
   const data = libery.signupData();
@@ -62,7 +65,7 @@ const SignUp = () => {
   const handleSignUp = () => {
     const { email, fullName, password } = logInInfo;
 
-    // Initialize error object
+    // Initialize error tracking object
     let errors = {
       emailError: "",
       fullNameError: "",
@@ -74,37 +77,53 @@ const SignUp = () => {
     if (!fullName.trim()) errors.fullNameError = "Full Name is required!";
     if (!password.trim()) errors.passwordError = "Password is required!";
 
-    // Set validation errors
+    // Set validation error messages to state
     setLogInInfoError(errors);
 
-    // If no errors, continue sign up
+    // If no validation errors, proceed with sign-up
     if (!errors.emailError && !errors.fullNameError && !errors.passwordError) {
-      setLoading(true);
+      setLoading(true); // Show loading spinner
 
-      // Step 1: Create User
+      let createdUser = null; // Store reference to newly created user
+
+      // Step 1: Create user account in Firebase Authentication
       createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          SuccesToast(`${fullName} Your Sign Up Successful`);
-
-          // Step 2: Send Email Verification
-          return sendEmailVerification(userCredential.user);
+        .then((userinfo) => {
+          SuccesToast("registarion sucessfull ");
+          updateProfile(auth.currentUser, {
+            displayName: fullName,
+            photoURL:
+              "https://images.pexels.com/photos/6940512/pexels-photo-6940512.jpeg?auto=compress&cs=tinysrgb&w=600",
+          });
         })
         .then(() => {
-          InfoToast(`${fullName} Check Your Email For Verification`);
+          const userRef = ref(db, `users/${auth.currentUser.uid}`);
+          set(userRef, {
+            userid: auth.currentUser.uid,
+            username: auth.currentUser.displayName || fullName,
+            email: auth.currentUser.email || email,
+            profile_picture:
+              auth.currentUser.photoURL ||
+              `https://images.pexels.com/photos/6940512/pexels-photo-6940512.jpeg?auto=compress&cs=tinysrgb&w=600`,
+          });
+          // send email for autheicate user;
+          return sendEmailVerification(auth.currentUser);
+        })
+        .then((mailData) => {
+          InfoToast("🦄mail send sucessfulll Check your email");
+        })
+        .then(() => {
+          InfoToast(`${fullName}, please check your email for verification`);
           console.log("Verification email sent successfully");
-
-          // Optional Step 3: You can add DB update or other logic here
-          return Promise.resolve(); // Just to continue the chain
         })
         .catch((err) => {
-          // Handle Firebase Errors
+          // Handle any error that occurred in the promise chain
           ErrorToast(err.code);
         })
         .finally(() => {
-          // Cleanup
+          // Reset form and loading state
           setLoading(false);
           setLogInInfo({
-            ...logInInfo,
             email: "",
             fullName: "",
             password: "",
@@ -144,7 +163,7 @@ const SignUp = () => {
       <div className="fixed bottom-0 bg-blue-600 left-0 h-[20dvh] w-full z-0"></div>
 
       {/* --- SIGNUP CARD --- */}
-      <div className="relative z-10 bg-white rounded-3xl shadow-xl flex w-[90%] max-w-6xl overflow-hidden">
+      <div className="relative z-10 bg-white rounded-3xl shadow-xl h-[90%] flex w-[90%] max-w-6xl overflow-hidden">
         {/* LEFT */}
         <div className="w-1/2 p-10 flex flex-col justify-center">
           <h1 className="text-4xl font-bold text-[#3c4bd8] mb-3">Sign Up</h1>
