@@ -7,6 +7,7 @@ import { IoAdd } from "react-icons/io5";
 import BookProgressBar from "../CommonComponent/BookProgressBar";
 import CircleProgressBar from "../CommonComponent/CircleProgressBar";
 import AddBookModal from "../AddBook/AddBookModal";
+import { setFirebaseData } from "../../utils/upload";
 
 const Banner = ({ totalPages = 100 }) => {
   const [timeLeft, setTimeLeft] = useState(3600);
@@ -50,6 +51,13 @@ const Banner = ({ totalPages = 100 }) => {
       .toString()
       .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
+  const handleUpload = () => {
+    alert("ghj");
+    setFirebaseData("groupList/", {
+      adminName: "auth.currentUser.displayName",
+    });
+  };
+
   console.log(showAddBook);
 
   return (
@@ -102,7 +110,10 @@ const Banner = ({ totalPages = 100 }) => {
             The Timekeeper
           </h3>
           <p className="text-sm text-gray-600">by Mitch Albom</p>
-          <button className="mt-8 cursor-pointer bg-gray-400 text-whitee px-5 py-1.5 rounded-3xl">
+          <button
+            onClick={handleUpload}
+            className="mt-8 cursor-pointer bg-gray-400 text-whitee px-5 py-1.5 rounded-3xl"
+          >
             Update
           </button>
         </div>

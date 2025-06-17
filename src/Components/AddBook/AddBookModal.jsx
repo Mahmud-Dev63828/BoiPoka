@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaBook, FaRegCalendarAlt, FaUpload } from "react-icons/fa";
 import CalendarPopup from "../CommonComponent/CalendarPopup";
 import SelectDropdown from "../CommonComponent/SelectDropdown ";
-import { update } from "firebase/database";
+import { validationField } from "../../validation/validationField";
+import { setFirebaseData } from "../../utils/upload";
+import { getAuth } from "firebase/auth";
 
 const AddBookModal = () => {
   const [book, setBook] = useState({
@@ -14,7 +16,10 @@ const AddBookModal = () => {
     coverUrl: "",
   });
 
+  const [bookError, setBookError] = useState({});
   const [showCalendar, setShowCalendar] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const inputImageRef = useRef(null);
 
   const formatDateTime = (date) => {
     if (!date) return "";
@@ -26,7 +31,7 @@ const AddBookModal = () => {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, files } = e.target;
     if (name === "startDate") {
       const parsedDate = new Date(value);
       if (!isNaN(parsedDate)) {
@@ -35,14 +40,15 @@ const AddBookModal = () => {
     } else {
       setBook((prev) => ({ ...prev, [name]: value }));
     }
+    setBookError((prev) => ({ ...prev, [`${name}Error`]: "" }));
   };
 
   const handleDateSelect = (date) => {
     setBook((prev) => ({ ...prev, endDate: date }));
+    setBookError((prev) => ({ ...prev, endDateError: "" }));
     setShowCalendar(false);
   };
 
-  // upload wizard
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://upload-widget.cloudinary.com/latest/global/all.js";
@@ -56,26 +62,17 @@ const AddBookModal = () => {
         {
           cloudName: "dazbaelpk",
           uploadPreset: "BoiPoka",
-          googleApiKey: "AIzaSyBj7HACYr7i1dWgC81FalKEwMuPXarS3rk",
-          searchBySites: ["all", "cloudinary.com"],
-          searchByRights: true,
           sources: [
             "local",
             "url",
             "camera",
             "image_search",
             "dropbox",
-            "image_search",
-            "shutterstock",
             "unsplash",
           ],
         },
         (error, result) => {
-          if (error) {
-            throw new Error("cloudinary profile picture upload error");
-          }
-          if (result.info.secure_url) {
-            // for update profile picture on state
+          if (result?.info?.secure_url) {
             setBook((prev) => ({
               ...prev,
               coverUrl: result.info.secure_url,
@@ -83,45 +80,107 @@ const AddBookModal = () => {
           }
         }
       );
-    } else {
-      throw new Error("upload failed");
     }
   };
 
-  const handleAdd = () => {
-    console.log("Book Added:", book);
+  const handleAdd = async () => {
+    const isValid = validationField(book, setBookError, {
+      ignoreFields: ["coverUrl"],
+    });
+    if (!isValid) return;
+
+    if (!book.endDate) {
+      setBookError((prev) => ({
+        ...prev,
+        endDateError: "End date is required",
+      }));
+      return;
+    }
+
+    const auth = getAuth();
+    try {
+      setLoading(true);
+
+      const newBookData = {
+        name: book.name,
+        author: book.author,
+        category: book.category,
+        startDate: book.startDate.toISOString(),
+        endDate: new Date(book.endDate).toISOString(),
+        coverUrl:
+          book.coverUrl && typeof book.coverUrl === "string"
+            ? book.coverUrl
+            : "", // 🔴 এই লাইন গুরুত্বপূর্ণ
+        createdBy: {
+          uid: auth.currentUser?.uid,
+          email: auth.currentUser?.email,
+          displayName: auth.currentUser?.displayName,
+          photoURL: auth.currentUser?.photoURL,
+        },
+      };
+
+      await setFirebaseData("books/", newBookData);
+      console.log("Book added:", newBookData);
+    } catch (err) {
+      console.error("Failed to add book:", err);
+    } finally {
+      setLoading(false);
+      setBook({
+        name: "",
+        author: "",
+        category: "Fiction",
+        startDate: new Date(),
+        endDate: "",
+        coverUrl: "",
+      });
+      setBookError({});
+      if (inputImageRef.current) inputImageRef.current.value = null;
+    }
   };
-  console.log(book);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6 relative">
-      <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg relative">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
+      <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg">
         <div className="text-center mb-6">
           <FaBook className="text-red-400 text-3xl mx-auto mb-2" />
           <h2 className="text-2xl font-bold text-gray-800">Add a Book</h2>
         </div>
 
         <div className="space-y-4">
-          <input
-            type="text"
-            name="name"
-            value={book.name}
-            onChange={handleChange}
-            placeholder="Book Name"
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-400 outline-none"
-          />
+          {/* Book Name */}
+          <div>
+            <input
+              type="text"
+              name="name"
+              value={book.name}
+              onChange={handleChange}
+              placeholder="Book Name"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-400 outline-none"
+            />
+            {bookError.nameError && (
+              <p className="text-red-500 text-sm">{bookError.nameError}</p>
+            )}
+          </div>
 
-          <input
-            type="text"
-            name="author"
-            value={book.author}
-            onChange={handleChange}
-            placeholder="Author Name"
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-400 outline-none"
-          />
+          {/* Author */}
+          <div>
+            <input
+              type="text"
+              name="author"
+              value={book.author}
+              onChange={handleChange}
+              placeholder="Author Name"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-400 outline-none"
+            />
+            {bookError.authorError && (
+              <p className="text-red-500 text-sm">{bookError.authorError}</p>
+            )}
+          </div>
 
+          {/* Category */}
           <SelectDropdown value={book.category} onChange={handleChange} />
 
+          {/* Start Date */}
           <div>
             <label className="block text-sm text-gray-600 mb-1">
               Start Date
@@ -135,6 +194,7 @@ const AddBookModal = () => {
             />
           </div>
 
+          {/* End Date */}
           <div className="relative">
             <label className="block text-sm text-gray-600 mb-1">End Date</label>
             <div className="flex items-center relative">
@@ -161,34 +221,47 @@ const AddBookModal = () => {
                 />
               </div>
             )}
-          </div>
 
-          {/* Cloudinary Upload Button */}
-          <div>
-            <label className="block text-sm text-gray-600 mb-1">
-              Book Cover
-            </label>
-            <button
-              onClick={handleCoverUpload}
-              className="flex items-center gap-2 bg-red-100 text-red-600 hover:bg-red-200 font-medium px-4 py-2 rounded-lg"
-            >
-              <FaUpload />
-              Upload Cover
-            </button>
-            {book.coverUrl && (
-              <img
-                src={book.coverUrl}
-                alt="Cover Preview"
-                className="mt-3 w-32 h-40 object-cover rounded-lg shadow-md"
-              />
+            {bookError.endDateError && (
+              <p className="text-red-500 text-sm mt-1">
+                {bookError.endDateError}
+              </p>
             )}
           </div>
 
+          {/* Cover Upload */}
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">
+              Book Cover (optional)
+            </label>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleCoverUpload}
+                className="flex items-center gap-2 bg-red-100 text-red-600 hover:bg-red-200 font-medium px-4 py-2 rounded-lg"
+              >
+                <FaUpload />
+                Upload Cover
+              </button>
+
+              {book.coverUrl && typeof book.coverUrl === "string" && (
+                <img
+                  src={book.coverUrl}
+                  alt="Cover Preview"
+                  className="w-20 h-28 object-cover rounded-lg shadow-md"
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Submit */}
           <button
             onClick={handleAdd}
-            className="w-full bg-red-400 hover:bg-red-500 text-white font-semibold py-2 rounded-xl transition"
+            className={`w-full ${
+              loading ? "bg-red-300" : "bg-red-400 hover:bg-red-500"
+            } text-white font-semibold py-2 rounded-xl transition`}
+            disabled={loading}
           >
-            Add Book
+            {loading ? "Adding..." : "Add Book"}
           </button>
         </div>
       </div>
